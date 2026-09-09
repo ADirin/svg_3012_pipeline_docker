@@ -1,7 +1,7 @@
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class SVG_3012_Pipeline {
+public class SVG_3012_Docker_Pipeline {
 
     public static void validateInputs(double speed, double distance) {
         if (speed < 0) {

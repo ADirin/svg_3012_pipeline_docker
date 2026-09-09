@@ -1,9 +1,20 @@
 pipeline {
     agent any
+
+    tools {
+        maven 'Maven3'
+    }
+
+    environment {
+        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
+        DOCKERHUB_CREDENTIALS_ID = 'Docker_Hub'
+        DOCKERHUB_REPO = 'amirdirin/svg_3012_2026'
+        DOCKER_IMAGE_TAG = 'latest'
+    }
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/ADirin/svg_3012_pipeline.git'
+                git 'https://github.com/ADirin/svg_3012_pipeline_docker.git'
             }
         }
         stage('Build') {
@@ -31,6 +42,22 @@ pipeline {
                 jacoco()
             }
         }
-        // follow the lecture demo for hub.docker.com deployment stages
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}")
+                }
+            }
+        }
+
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS_ID) {
+                        docker.image("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}").push()
+                    }
+                }
+            }
+        }
     }
 }
